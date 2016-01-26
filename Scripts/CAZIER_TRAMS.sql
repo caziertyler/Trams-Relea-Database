@@ -1,0 +1,430 @@
+-- TRAMS v1.0 Database
+-- Tyler Cazier 6/3/15
+-- Comments
+
+-- Switch to and use 'Master' database.
+USE Master
+
+-- Check to see if database already exists.  If so, delete.
+IF EXISTS(SELECT * FROM sysdatabases WHERE name='CAZIER_TRAMS')
+DROP DATABASE CAZIER_TRAMS
+
+GO
+
+-- Create database.
+CREATE DATABASE CAZIER_TRAMS
+
+-- Use primary partition.
+ON PRIMARY
+(
+NAME = 'CAZIER_TRAMS',
+FILENAME = 'C:\Stage\CAZIER_TRAMS.mdf',
+SIZE = 4MB,
+MAXSIZE = 4MB,
+FILEGROWTH = 500KB
+)
+
+-- Create log file.
+LOG ON
+(
+NAME = 'CAZIER_TRAMS_Log',
+FILENAME = 'C:\Stage\CAZIER_TRAMS.ldf',
+SIZE = 1200KB, 
+MAXSIZE = 5MB,
+FILEGROWTH = 500KB
+)
+
+GO
+
+--	Database created.  Begin creating tables.
+
+-- Switch to and use CAZIER_TRAMS database.
+USE CAZIER_TRAMS
+
+-- Create PERSON Table
+CREATE TABLE "PERSON"
+(
+PersonID			int				NOT NULL	IDENTITY(1,1),
+PersonFirst			nvarchar(50)	NOT NULL,
+PersonLast			nvarchar(50)	NOT NULL,
+PersonAddress		varchar(200)	NOT NULL,
+PersonCity			varchar(50)		NOT NULL,
+PersonState			char(2),
+PersonPostalCode	varchar(10)		NOT NULL,
+PersonCountry		varchar(20)		NOT NULL,
+PersonPhone			varchar(20)		NOT NULL,
+PersonEmail			varchar(200)	NOT NULL
+)
+
+-- Create UNITTYPE Table
+CREATE TABLE "UNITTYPE"
+(
+UnitTypeID			tinyint		NOT NULL	IDENTITY(1,1),
+UnitTypeDescription	varchar(20) NOT NULL
+)
+
+-- Create AMENITY Table
+CREATE TABLE "AMENITY"
+(
+AmenityID			smallint	NOT NULL	IDENTITY(1,1),
+AmenityDescription	varchar(50)	NOT	NULL
+)
+
+-- Create TRANSCATEGORY Table
+CREATE TABLE "TRANSCATEGORY"
+(
+TranscategoryID		smallint	NOT NULL	IDENTITY(1,1),
+TranscategoryDescription	varchar(50)	NOT	NULL,
+TransTaxType		char(1)		NOT NULL
+)
+
+-- Create TAXLOCATION Table
+CREATE TABLE "TAXLOCATION"
+(
+TaxLocationID				smallint	NOT NULL	IDENTITY(1,1),
+TaxCounty			varchar(50)	NOT	NULL,
+TaxState			char(2)		NOT NULL
+)
+
+-- Create UNIT Table
+CREATE TABLE "UNIT"
+(
+UnitID				smallint	NOT NULL,
+UnitNumber			varchar(5)	NOT	NULL,
+PropertyID			smallint,
+UnitTypeID			tinyint		NOT	NULL
+)
+
+-- Create PROPERTY Table
+CREATE TABLE "PROPERTY"
+(
+PropertyID			smallint	NOT NULL,
+PropertyName		varchar(50)	NOT NULL,
+PropertyAddress		varchar(200)	NOT NULL,
+PropertyCity		varchar(50)		NOT NULL,
+PropertyState		char(2),
+PropertyPostalCode	varchar(10)	NOT NULL,
+PropertyCountry		varchar(20)	NOT NULL,
+PropertyPhone		varchar(20)	NOT NULL,
+PropertyMgmtFee		decimal(4,2)	NOT NULL,
+PropertyWebAddress	varchar(100)	NOT NULL,
+TaxLocationID		smallint
+)
+
+-- Create TAXRATE Table
+CREATE TABLE "TAXRATE"
+(
+TaxID				int			NOT NULL	IDENTITY(1,1),
+TaxRate				decimal(5,3)	NOT NULL,
+TaxType				char(1)		NOT NULL,
+TaxDescription		varchar(50)	NOT NULL,
+TaxStartDate		date		NOT	NULL,
+TaxEndDate			date,
+TaxLocationID		smallint	NOT NULL
+)
+
+-- Create UNITOWNER Table
+CREATE TABLE "UNITOWNER"
+(
+UnitID				smallint	NOT NULL,
+PersonID			int			NOT NULL,
+OwnerStartDate		date		NOT NULL,
+OwnerEndDate		date
+)
+
+-- Create UNITRATE Table
+CREATE TABLE "UNITRATE"
+(
+UnitRateID			smallint	NOT NULL	IDENTITY(1,1),
+UnitRate			smallmoney	NOT NULL,
+UnitRateBeginDate	date	NOT NULL,
+UnitRateEndDate		date		NOT NULL,
+UnitRateDescription	varchar(50),
+UnitRateActive		bit			NOT NULL,
+PropertyID			smallint	NOT NULL,
+UnitTypeID			tinyint		NOT NULL
+)
+
+-- Create UNITAMENITY Table
+CREATE TABLE "UNITAMENITY"
+(
+AmenityID			smallint	NOT NULL,
+UnitID				smallint	NOT NULL
+)
+
+-- Create PROPERTYAMENITY Table
+CREATE TABLE "PROPERTYAMENITY"
+(
+AmenityID			smallint	NOT NULL,
+PropertyID			smallint	NOT NULL
+)
+
+-- Create RESERVATION Table
+CREATE TABLE "RESERVATION"
+(
+ReservationId		int			NOT NULL  IDENTITY(1,1),
+ResDate				smalldatetime	NOT NULL,
+ResStatus			char(1)		NOT NULL,
+ResCheckInDate		date		NOT NULL,
+ResNights			tinyint		NOT NULL,
+ResQuotedRate		smallmoney	NOT NULL,
+ResDepositPaid		smallmoney	NOT NULL,
+ResCCAuth			varchar(25)	NOT NULL,
+UnitRateID			smallint	NOT NULL,
+PersonID			int			NOT NULL
+)
+
+-- Create FOLIO Table
+CREATE TABLE "FOLIO"
+(
+FolioID				int			NOT NULL IDENTITY(1,1),
+FolioStatus			char(1)		NOT NULL,
+FolioRate			smallmoney	NOT NULL,
+FolioCheckInDate	smalldatetime	NOT NULL,
+FolioCheckOutDate	smalldatetime,
+UnitID				smallint	NOT NULL,
+ReservationID		int			NOT NULL
+)
+
+-- Create FOLIOTRANSACTION Table
+CREATE TABLE "FOLIOTRANSACTION"
+(
+TransID				bigint		NOT NULL IDENTITY(1,1),
+TransDate			datetime	NOT NULL,
+TransAmount			smallmoney	NOT NULL,
+TransDescription	varchar(50)	NOT NULL,
+TransCategoryID		smallint	NOT NULL,
+FolioID				int			NOT NULL
+)
+
+GO
+
+-- Add Primary Keys to each of the tables.
+
+ALTER TABLE "PERSON"
+	ADD CONSTRAINT PK_PersonID
+	PRIMARY KEY (PersonID)
+
+ALTER TABLE "UNITTYPE"
+	ADD CONSTRAINT PK_UnitTypeID
+	PRIMARY KEY (UnitTypeID)
+
+ALTER TABLE "AMENITY"
+	ADD CONSTRAINT PK_AmenityID
+	PRIMARY KEY (AmenityID)
+
+ALTER TABLE "TRANSCATEGORY"
+	ADD CONSTRAINT PK_TransCategoryID
+	PRIMARY KEY (TransCategoryID)
+
+ALTER TABLE "TAXLOCATION"
+	ADD CONSTRAINT PK_TaxLocationID
+	PRIMARY KEY (TaxLocationID)
+
+ALTER TABLE "UNIT"
+	ADD CONSTRAINT PK_UnitID
+	PRIMARY KEY (UnitID)
+
+ALTER TABLE "PROPERTY"
+	ADD CONSTRAINT PK_PropertyID
+	PRIMARY KEY (PropertyID)
+
+ALTER TABLE "TAXRATE"
+	ADD CONSTRAINT PK_TaxID
+	PRIMARY KEY (TaxID)
+
+ALTER TABLE "UNITOWNER"
+	ADD CONSTRAINT PK_UnitIDPersonID
+	PRIMARY KEY (UnitID, PersonID)
+
+ALTER TABLE "UNITRATE"
+	ADD CONSTRAINT PK_UnitRateID
+	PRIMARY KEY (UnitRateID)
+
+ALTER TABLE "UNITAMENITY"
+	ADD CONSTRAINT PK_AmenityIDUnitID
+	PRIMARY KEY (AmenityID, UnitID)
+
+ALTER TABLE "PROPERTYAMENITY"
+	ADD CONSTRAINT PK_AmenityIDPropertyID
+	PRIMARY KEY (AmenityID, PropertyID)
+
+ALTER TABLE "RESERVATION"
+	ADD CONSTRAINT PK_ReservationId
+	PRIMARY KEY (ReservationId)
+
+ALTER TABLE "FOLIO"
+	ADD CONSTRAINT PK_FolioID
+	PRIMARY KEY (FolioID)
+
+ALTER TABLE "FOLIOTRANSACTION"
+	ADD CONSTRAINT PK_TransID
+	PRIMARY KEY (TransID)
+	
+
+
+GO
+
+-- Alter each of the tables to add Foreign Keys
+
+ALTER TABLE "UNIT"
+
+	ADD CONSTRAINT FK_UNIT_UnitTypeID
+	FOREIGN KEY (UnitTypeID) REFERENCES "UNITTYPE" (UnitTypeID)
+	ON UPDATE Cascade
+	ON DELETE Cascade
+
+ALTER TABLE "PROPERTY"
+
+	ADD CONSTRAINT FK_PROPERTY_TaxLocationID
+	FOREIGN KEY (TaxLocationID) REFERENCES "TAXLOCATION" (TaxLocationID)
+	ON UPDATE Cascade
+	ON DELETE Cascade
+
+ALTER TABLE "TAXRATE"
+
+	ADD CONSTRAINT FK_TAXRATE_TaxLocationID
+	FOREIGN KEY (TaxLocationID) REFERENCES "TAXLOCATION" (TaxLocationID)
+	ON UPDATE Cascade
+	ON DELETE Cascade
+
+ALTER TABLE "UNITOWNER"
+
+	ADD CONSTRAINT FK_UNITOWNER_UnitID
+	FOREIGN KEY (UnitID) REFERENCES "UNIT" (UnitID)
+	ON UPDATE Cascade
+	ON DELETE Cascade,
+	
+	CONSTRAINT FK_UNITOWNER_PersonID
+	FOREIGN KEY (PersonID) REFERENCES "PERSON" (PersonID)
+	ON UPDATE Cascade
+	ON DELETE Cascade
+
+ALTER TABLE "UNITRATE"
+
+	ADD CONSTRAINT FK_UNITRATE_PropertyID
+	FOREIGN KEY (PropertyID) REFERENCES "PROPERTY" (PropertyID)
+	ON UPDATE Cascade
+	ON DELETE Cascade,
+	
+	CONSTRAINT FK_UNITRATE_UnitTypeID
+	FOREIGN KEY (UnitTypeID) REFERENCES "UNITTYPE" (UnitTypeID)
+	ON UPDATE Cascade
+	ON DELETE Cascade
+
+ALTER TABLE "UNITAMENITY"
+
+	ADD CONSTRAINT FK_UNITAMENITY_AmenityID
+	FOREIGN KEY (AmenityID) REFERENCES "AMENITY" (AmenityID)
+	ON UPDATE Cascade
+	ON DELETE Cascade,
+	
+	CONSTRAINT FK_UNITAMENITY_UnitID
+	FOREIGN KEY (UnitID) REFERENCES "UNIT" (UnitID)
+	ON UPDATE Cascade
+	ON DELETE Cascade
+
+ALTER TABLE "PROPERTYAMENITY"
+
+	ADD CONSTRAINT FK_PROPERTYAMENITY_AmenityID
+	FOREIGN KEY (AmenityID) REFERENCES "AMENITY" (AmenityID)
+	ON UPDATE Cascade
+	ON DELETE Cascade,
+	
+	CONSTRAINT FK_PROPERTYAMENITY_PropertyID
+	FOREIGN KEY (PropertyID) REFERENCES "PROPERTY" (PropertyID)
+	ON UPDATE Cascade
+	ON DELETE Cascade
+
+ALTER TABLE "RESERVATION"
+
+	ADD CONSTRAINT FK_RESERVATION_UnitRateID
+	FOREIGN KEY (UnitRateId) REFERENCES "UNITRATE" (UnitRateID)
+	ON UPDATE Cascade
+	ON DELETE Cascade,
+	
+	CONSTRAINT FK_RESERVATION_PersonID
+	FOREIGN KEY (PersonId) REFERENCES "PERSON" (PersonID)
+	ON UPDATE Cascade
+	ON DELETE Cascade
+
+ALTER TABLE "FOLIO"
+
+	ADD CONSTRAINT FK_FOLIO_ReservationID
+	FOREIGN KEY (ReservationId) REFERENCES "RESERVATION" (ReservationID)
+	ON UPDATE Cascade
+	ON DELETE Cascade
+
+ALTER TABLE "FOLIOTRANSACTION"
+
+	ADD CONSTRAINT FK_FOLIOTRANSACTION_FolioID
+	FOREIGN KEY (FolioId) REFERENCES "FOLIO" (FolioID)
+	ON UPDATE Cascade
+	ON DELETE Cascade
+
+GO
+
+-- Check constraints.
+
+-- Ensure conly valid a TRANSCATEGORY TransTaxType can be entered
+ALTER TABLE "TRANSCATEGORY"
+	ADD CONSTRAINT CK_TransTaxType
+	CHECK (TransTaxType IN ('N', 'L', 'G', 'F'))
+
+-- Ensure conly valid a TAXRATE TaxType can be entered
+ALTER TABLE "TAXRATE"
+	ADD CONSTRAINT CK_TaxType
+	CHECK (TaxType IN ('L', 'G', 'F'))
+
+-- Ensure conly valid a RESERVATION ResStatus can be entered
+ALTER TABLE "RESERVATION"
+	ADD CONSTRAINT CK_ResStatus
+	CHECK (ResStatus IN ('A', 'C', 'X'))
+
+-- Ensure conly valid a FOLIO FolioStatus can be entered
+ALTER TABLE "FOLIO"
+	ADD CONSTRAINT CK_FolioStatus
+	CHECK (FolioStatus IN ('B', 'C', 'X'))
+
+
+-- Add defaults
+
+-- Set TRANSCATEGORY TransTaxType default
+ALTER TABLE "TRANSCATEGORY"
+	ADD CONSTRAINT DK_TransTaxType
+	DEFAULT 'N' FOR TransTaxType
+
+-- Set TAXRATE TaxType default
+ALTER TABLE "TAXRATE"
+	ADD CONSTRAINT DK_TaxType
+	DEFAULT 'L' FOR TaxType
+
+-- Set RESERVATION ResStatus default
+ALTER TABLE "RESERVATION"
+	ADD CONSTRAINT DK_ResStatus
+	DEFAULT 'A' FOR ResStatus
+
+-- Set FOLIO FolioStatus default
+ALTER TABLE "FOLIO"
+	ADD CONSTRAINT DK_FolioStatus
+	DEFAULT 'B' FOR FolioStatus
+
+GO
+
+-- Populate Data	
+
+BULK INSERT PERSON FROM 'C:\stage\Person.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1,DATAFILETYPE='widechar');
+BULK INSERT UNITTYPE FROM 'C:\stage\UnitType.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1);
+BULK INSERT AMENITY FROM 'C:\stage\Amenity.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1);
+BULK INSERT TRANSCATEGORY FROM 'C:\stage\TransCategory.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1);
+BULK INSERT TAXLOCATION FROM 'C:\stage\TaxLocation.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1);
+BULK INSERT UNIT FROM 'C:\stage\Unit.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1);
+BULK INSERT PROPERTY FROM 'C:\stage\Property.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1);
+BULK INSERT TAXRATE FROM 'C:\stage\TaxRate.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1);
+BULK INSERT UNITOWNER FROM 'C:\stage\UnitOwner.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1);
+BULK INSERT UNITRATE FROM 'C:\stage\UnitRate.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1);
+BULK INSERT UNITAMENITY FROM 'C:\stage\UnitAmenity.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1);
+BULK INSERT PROPERTYAMENITY FROM 'C:\stage\PropertyAmenity.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1);
+BULK INSERT RESERVATION FROM 'C:\stage\Reservation.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1);
+BULK INSERT FOLIO FROM 'C:\stage\Folio.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1);
+BULK INSERT FOLIOTRANSACTION FROM 'C:\stage\FolioTransaction.txt' WITH (FIELDTERMINATOR='|',FIRSTROW=1);

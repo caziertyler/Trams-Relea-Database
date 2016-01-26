@@ -1,0 +1,10 @@
+1|The Backdrop|An outdoor ampitheatre with an amazing view of the mountains and top-of-the-line stage equipment and performers.|Venue is on the North end of the resort by the space.|12000
+2|Tric|A concert venue with mesmerizing night life lights and incredible bar.|Located on the West side of the resort entrance.|15000
+3|The Jetted Tub|Event seating is in our world-reknown jetted hot tubs that are guaranteed to release stress while watching some of the best shows on Earth. All guestsare served complimentary champagne.|In the resort dining area.|11000
+4|The Heckler|Famous early 1900's style comedian club where only the best are allowed to grace the stage.||18000
+5|Big Brown Bear|Outdoor theater with a summer camp feel and fireside-like lighting. Performances are like real-life enactments of the campfire stories from your childhood||10000
+6|The Blank Stare|A golden stage with golden tapestries. The performances are sure to leave you speechless.  Be sure to visit the bar and sample some of our famous alcoholic recipes including the original Liquid Gold.||17000
+7|Egyptian Princess|Children and adults alike will think they have entered the palace of an ancient Egyptian goddess with its hanging draperies of elaborate color and design and over-sized pillow seats fit for a princess or prince.||14000
+8|Dan and Nan's Bar for Hams|Feel at home at Dan and Nan's mom-and-pop stage-side grill and bar. Experience dinner and entertainment in a cozy lodge with cooking that will remind you of mom's house.||13000
+9|The Joker|A comedian event-hall that is not for the faint-hearted. The best-of-the-best comedians perform here and they do not hold back.  Prepare to laugh until you faint.||15000
+10|Velvet Ropes|A night club like no other. Leave your clothes at home and experience the dazzling themes of this adult-only venue. Nice and naughty is what you will find as only the best performers grace the stage of this amazing night scene.||17000
